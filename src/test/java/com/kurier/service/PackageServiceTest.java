@@ -31,6 +31,52 @@ class PackageServiceTest {
     private PackageService packageService;
 
     @Test
+    void save(){
+        Courier courier = new Courier(50L,"Karol","kraus", CourierState.FREE, List.of());
+        Customer customer = new Customer(50L,"Karol","kraus","AAAA", List.of());
+        Package pack = new Package();
+        Mockito.when(packageRepository.save(pack)).thenReturn(new Package(1L,customer, courier,PackageState.NEW,20));
+        Package save = packageService.save(pack);
+        assertThat(save.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void findAll(){
+        Mockito.when(packageRepository.findAll()).thenReturn(List.of());
+        List<Package> all = packageService.findAll();
+        assertThat(all).isEmpty();
+    }
+
+    @Test
+    void findbyId(){
+        Mockito.when(packageRepository.findById(1L)).thenReturn(Optional.of(new Package()));
+        Optional<Package> pack = packageService.findbyId(1L);
+        assertThat(pack).isNotEmpty();
+    }
+
+    @Test
+    void deleteByID(){
+        packageRepository.deleteById(1L);
+        Mockito.verify(packageRepository,Mockito.times(1)).deleteById(1L);
+    }
+
+    @Test
+    void findAllbyCustomer(){
+        Customer customer = new Customer();
+        Mockito.when(packageRepository.findAllBySender(customer)).thenReturn(List.of());
+        List<Package> all = packageService.findAllbyCustomer(customer);
+        assertThat(all).isEmpty();
+    }
+
+    @Test
+    void findAllbyCustomerAndState(){
+        Customer customer = new Customer();
+        Mockito.when(packageRepository.findAllBySenderAndState(customer, PackageState.CANCELED)).thenReturn(List.of());
+        List<Package> all = packageService.findAllbyCustomerandState(customer,PackageState.CANCELED);
+        assertThat(all).isEmpty();
+    }
+
+    @Test
     void PickUp(){
         Courier courier = new Courier(50L,"Karol","kraus", CourierState.FREE, List.of());
         Customer customer = new Customer(50L,"Karol","kraus","AAAA", List.of());
